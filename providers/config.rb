@@ -1,9 +1,9 @@
 #
 # Author:: Adam Jacob <adam@opscode.com>
 # Cookbook Name:: unicorn
-# Definition:: unicorn_config
+# Provider:: config
 #
-# Copyright 2009, Opscode, Inc.
+# Copyright 2009-2012, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@
 # limitations under the License.
 #
 
-define :unicorn_config, :listen => nil, :working_directory => nil, :worker_timeout => 60, :preload_app => false, :worker_processes => 4, :before_fork => nil, :after_fork => nil, :pid => nil, :stderr_path => nil, :stdout_path => nil, :notifies => nil, :owner => nil, :group => nil, :mode => nil do
-  config_dir = File.dirname(params[:name])
+action :create do
+  config_dir = File.dirname(new_resource.name)
 
   directory config_dir do
     recursive true
     action :create
   end
 
-  tvars = params.clone
-  params[:listen].each do |port, options|
+  tvars = new_resource.to_hash
+  new_resource.listen.each do |port, options|
     oarray = Array.new
     options.each do |k, v|
       oarray << ":#{k} => #{v}"
@@ -35,15 +35,16 @@ define :unicorn_config, :listen => nil, :working_directory => nil, :worker_timeo
     tvars[:listen][port] = oarray.join(", ")
   end
 
-  template params[:name] do
+  template new_resource.name do
     source "unicorn.rb.erb"
     cookbook "unicorn"
     mode "0644"
-    owner params[:owner] if params[:owner]
-    group params[:group] if params[:group]
-    mode params[:mode]   if params[:mode]
-    variables params
-    notifies *params[:notifies] if params[:notifies]
+    owner new_resource.owner if new_resource.owner
+    group new_resource.group if new_resource.group
+    mode new_resource.mode if new_resource.mode
+    variables new_resource.to_hash
+    notifies *new_resource.notifies if new_resource.notifies
   end
 
+  new_resource.updated_by_last_action(true)
 end
