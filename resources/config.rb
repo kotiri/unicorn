@@ -22,7 +22,7 @@ actions :create
 attribute :listen, :kind_of => Mash, :default => Mash.new
 attribute :working_directory, :kind_of => String, :default => nil
 attribute :worker_timeout, :kind_of => Number, :default => 60
-attribute :preload_app, :kind_of => Boolean, :default => false
+attribute :preload_app, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :worker_processes, :kind_of => Number, :default => 4
 attribute :before_fork, :kind_of => String, :default => nil
 attribute :after_fork, :kind_of => String, :default => nil
