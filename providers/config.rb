@@ -19,7 +19,7 @@
 #
 
 action :create do
-  config_dir = File.dirname(new_resource.name)
+  config_dir = ::File.dirname(new_resource.name)
 
   directory config_dir do
     recursive true
@@ -43,7 +43,7 @@ action :create do
     group new_resource.group if new_resource.group
     mode new_resource.mode if new_resource.mode
     variables new_resource.to_hash
-    notifies *new_resource.notifies if new_resource.notifies
+    notifies *new_resource.notifies unless new_resource.notifies.empty?
   end
 
   new_resource.updated_by_last_action(true)
